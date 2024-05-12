@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "repl-nix-cinema-ticket-booking-system"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{include = "repl_nix_cinema_ticket_booking_system"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+flask = "^3.0.3"
+sqlalchemy = "^2.0.30"
+pandas = "^2.2.2"
+numpy = "^1.26.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="../static/header_style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=M+PLUS+Rounded+1c&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title> Cinema-Ticket-Booking-System</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Projekt Repertuar</h1>
+    <h2 class="secondary-text-color end-of-header">Strona umożliwiająca klientom kupowanie, rezerwacje oraz przeglądanie filmów</h2>
+
+    <h2>Filmy</h2>
+    <div class="repertoire">
+      {% for index, movie in movies.iterrows() %}
+      <div class="movie_list">
+        <a href="#" class="movie_poster_cont"><img class="movie_poster" src="{{movie['poster']}}" alt="movie_poster"></a>
+        <div class="movie">
+          <div class="movie_title"><a href="#" class= "movie_title">{{movie['title']}}</a></div>
+          <p class="movie_info">
+            {% for genre in movie['movie_genre'].split(' / ') %}
+              <span class="movie_info_genre">{{ genre }}</span> |
+            {% endfor %}
+            <span class="movie_info_age_category">{{movie.age_category}}</span> |
+            <span class="movie_info_duration">Czas trwania: {{movie.duration}}</span>
+          </p>
+          <p class="movie_description">{{movie.movie_description}}</p>
+          {% if movie.movie_description|length > 300 %}            
+            <div class="read_more-cont">
+              <p class="movie_read-more">Czytaj więcej</p>
+            </div>
+          {% endif %}
+          <div class="movie_seances">
+            {% for index, seance in seances[seances['movie_id'] == movie['movie_id']].iterrows() %}
+              <a href="#" class="movie_seances-seance{% if loop.index > 2 %} hidden{% endif %}">
+                <p>{{ seance['start_time'] }}</p>
+                <p>{{ seance['movie_inf'] }}</p>
+              </a>
+            {% endfor %}
+            {% if seances[seances['movie_id'] == movie['movie_id']].shape[0] > 2 %}
+              <a href="#" class="show-more-seances movie_seances-seance">Pokaż więcej</a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const showMoreButtons = document.querySelectorAll('.show-more-seances');
+
+      showMoreButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+          event.preventDefault();
+          const seancesContainer = this.parentNode;
+          const hiddenSeances = seancesContainer.querySelectorAll('.hidden');
+
+          hiddenSeances.forEach(seance => {
+            seance.classList.remove('hidden');
+          });
+
+          this.style.display = 'none';
+        });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const readMoreButtons = document.querySelectorAll('.read_more-cont');
+
+      readMoreButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+          event.preventDefault();
+          const description = this.parentNode.querySelector('.movie_description');
+          description.style.webkitLineClamp = 'unset'; // Usuń ograniczenie linii
+          this.style.display = 'none'; // Ukryj przycisk "Czytaj więcej"
+        });
+      });
+    });
+  </script>
+  
+</body>
+</html>
+
