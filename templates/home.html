@@ -15,13 +15,23 @@
     <h1>Projekt Repertuar</h1>
     <h2 class="secondary-text-color end-of-header">Strona umożliwiająca klientom kupowanie, rezerwacje oraz przeglądanie filmów</h2>
 
-    <h2>Filmy</h2>
+    <h1>Teraz gramy</h1>
+    <label for="date-picker">Wybierz datę:</label>
+    <select id="date-picker" onchange="filterByDate()">
+      <option value="" selected>Rozwin</option>
+      {% for date in movie_dates.sort_values(by=['movie_date']).values %}
+          <option value="{{ date[0] }}">{{ date[0] }}</option>
+      {% endfor %}
+    </select>
+
+    <h2>Repertuar dnia: {{selected_date}}</h2>
+    
     <div class="repertoire">
       {% for index, movie in movies.iterrows() %}
       <div class="movie_list">
-        <a href="#" class="movie_poster_cont"><img class="movie_poster" src="{{movie['poster']}}" alt="movie_poster"></a>
+        <a href="/movie/{{movie['title']}}" class="movie_poster_cont"><img class="movie_poster" src="{{movie['poster']}}" alt="movie_poster"></a>
         <div class="movie">
-          <div class="movie_title"><a href="#" class= "movie_title">{{movie['title']}}</a></div>
+          <div class="movie_title"><a href="/movie/{{movie['title']}}" class= "movie_title">{{movie['title']}}</a></div>
           <p class="movie_info">
             {% for genre in movie['movie_genre'].split(' / ') %}
               <span class="movie_info_genre">{{ genre }}</span> |
@@ -36,7 +46,7 @@
             </div>
           {% endif %}
           <div class="movie_seances">
-            {% for index, seance in seances[seances['movie_id'] == movie['movie_id']].iterrows() %}
+            {% for index, seance in seances[seances['movie_id'] == movie['movie_id']].sort_values(by=['start_time']).iterrows() %}
               <a href="#" class="movie_seances-seance{% if loop.index > 2 %} hidden{% endif %}">
                 <p>{{ seance['start_time'] }}</p>
                 <p>{{ seance['movie_inf'] }}</p>
@@ -53,6 +63,11 @@
     
   </div>
   <script>
+    function filterByDate() {
+      const selectedDate = document.getElementById('date-picker').value;
+      window.location.href = `/?date=${selectedDate}`;
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       const showMoreButtons = document.querySelectorAll('.show-more-seances');
 
@@ -69,9 +84,7 @@
           this.style.display = 'none';
         });
       });
-    });
 
-    document.addEventListener('DOMContentLoaded', function() {
       const readMoreButtons = document.querySelectorAll('.read_more-cont');
 
       readMoreButtons.forEach(button => {
@@ -84,6 +97,7 @@
       });
     });
   </script>
+
   
 </body>
 </html>

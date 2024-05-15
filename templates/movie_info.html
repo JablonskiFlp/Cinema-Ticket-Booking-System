@@ -4,9 +4,100 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css">
+  <link rel="stylesheet" type="text/css" href="../static/movie_inf_style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=M+PLUS+Rounded+1c&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>Movie Info</title>
 </head>
 <body>
-  
+  <img class="poster_img" src="../{{movie.poster.values[0]}}" alt="img">
+  <img class="poster_img_end" src="../{{movie.poster.values[0]}}" alt="img">
+  <div class="movie-info">
+    <h1>{{movie.title.values[0]}}</h1>
+    <div class="swiper-container">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide">
+          <img src="../static/frame.png" alt="img">
+          
+          <div class="info"">
+            <h4>Gatunek:</h4>
+            {% for genre in movie['movie_genre'].values[0].split(' / ') %}
+                <span>{{ genre }} </span>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="../static/frame.png" alt="img">
+          <div class="info"">
+            <h4>W reżyserii:</h4>
+            <h3>{{movie.direction.values[0]}}</h3>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="../static/frame.png" alt="img">
+          <div class="info">
+            <h4>Obsada:</h4>
+            {% for actor in movie.movie_cast.values[0].split(", ") %}
+              {% if loop.index <= 3 %}
+                <h3>{{ actor }}</h3>
+              {% endif %}
+            {% endfor %}
+              </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="../static/frame.png" alt="img">
+          <div class="info"">
+            <h4>Produkcja:</h4>
+            <h3>{{movie.production.values[0]}}</h3>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="../static/frame.png" alt="img">
+          <div class="info"">
+            <h4>Czas trwania:</h4>
+            <h3>{{movie.duration.values[0]}}</h3>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="../static/frame.png" alt="img">
+          <div class="info"">
+            <h4>Ograniczenia wiekowe:</h4>
+            <h3>{{movie.age_category.values[0]}}</h3>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <img src="../static/frame.png" alt="img">
+          <div class="info"">
+            <h4>Premiera:</h4>
+            <h3>{{movie.premiere.values[0]}}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="movie_description">{{movie.movie_description.values[0]}}</p>
+
+    
+  </div>
+
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    var swiper = new Swiper('.swiper-container', {
+      effect: "coverflow",
+      grabCursor: true,
+      centeredSlides: true,
+      slidesPerView: "auto",
+      initialSlide: 1, // Ustawiamy początkowy slide na drugi
+      coverflowEffect: {
+        rotate: 20,
+        stretch: 0,
+        depth: 50,
+        modifier: 1,
+
+      }
+    });
+
+  </script>
 </body>
 </html>

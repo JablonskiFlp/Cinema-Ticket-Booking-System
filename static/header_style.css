@@ -146,3 +146,15 @@ a{
 .hidden {
   display: none;
 }
+
+select {
+  padding: 5px; /* Dodatkowy wypełniacz */
+  border: 1px solid #ccc; /* Grubość i styl obramowania */
+  border-radius: 5px; /* Zaokrąglone narożniki */
+  outline: none; /* Usunięcie domyślnej obwódki przy fokusie */
+}
+
+/* Styl dla opcji wyboru */
+option {
+  padding: 5px;
+}
