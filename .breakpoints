@@ -3,16 +3,16 @@
     "app.py": [
       {
         "id": "f05bd77a-0903-4686-805c-fd59555c7010",
-        "line": 15,
-        "version": 2109,
-        "index": 510
+        "line": 18,
+        "version": 3967,
+        "index": 717
       }
     ],
     "static/movie_inf_style.css": [
       {
         "id": "2c267a13-cf33-4274-8177-23da44d1cff6",
         "line": 66,
-        "version": 938,
+        "version": 988,
         "index": 1050
       }
     ]

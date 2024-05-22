@@ -23,7 +23,7 @@
           
           <div class="info"">
             <h4>Gatunek:</h4>
-            {% for genre in movie['movie_genre'].values[0].split(' / ') %}
+            {% for genre in movie['movie_genre'].values[0] %}
                 <span>{{ genre }} </span>
             {% endfor %}
           </div>

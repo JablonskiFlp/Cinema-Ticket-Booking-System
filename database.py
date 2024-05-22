@@ -34,17 +34,17 @@ def load_movies_from_db(movie_ids):
 
     # Dodanie ścieżki do plakatów do danych o filmach
     movies['poster'] = folder_path + movies['poster']
-
+    genre_lists = [[genre.lower() for genre in movie_genre.split(' / ')]
+                   for movie_genre in movies['movie_genre'].values]
+    movies['movie_genre'] = genre_lists
     return movies
-
-
+      
 def get_unique_dates_from_db():
     with engine.connect() as conn:
         # Budowanie zapytania SQL
         sql_query = "SELECT DISTINCT movie_date FROM Seances"
         movie_dates = pd.read_sql_query(sql_query, conn)
         return movie_dates
-
 
 def load_seances_from_db(date=None):
     with engine.connect() as conn:
@@ -58,10 +58,16 @@ def load_seances_from_db(date=None):
         seances['start_time'] = time_formatting(seances)
         return seances
 
+def load_reservations_for_movie_from_db(seance_id):
+    with engine.connect() as conn:
+        sql_query = pd.read_sql_query(
+            f"SELECT * FROM rezerwacje WHERE seance_id = '{seance_id}'", conn)
+        reservation = pd.DataFrame(sql_query)
+        return reservation
 
-def load_movie_from_db(title):
-    movies = load_movies_from_db()
-    return movies[movies.title == title]
+def load_movie_from_db(id):
+    movies = load_movies_from_db(id)
+    return movies
 
 
 def load_seances_for_movie_from_db(id):
@@ -71,3 +77,20 @@ def load_seances_for_movie_from_db(id):
         seances = pd.DataFrame(sql_query)
         seances['start_time'] = time_formatting(seances)
         return seances
+
+
+def load_seance_from_db(id):
+    with engine.connect() as conn:
+        sql_query = pd.read_sql_query(
+            f"SELECT * FROM Seances WHERE seance_id = '{id}'", conn)
+        seances = pd.DataFrame(sql_query)
+        seances['start_time'] = time_formatting(seances)
+        return seances
+
+
+def load_room_from_db(room_number):
+    with engine.connect() as conn:
+        sql_query = pd.read_sql_query(
+            f"SELECT * FROM rooms WHERE room_id = '{room_number}'", conn)
+        room = pd.DataFrame(sql_query)
+        return room

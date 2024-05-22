@@ -16,24 +16,34 @@
     <h2 class="secondary-text-color end-of-header">Strona umożliwiająca klientom kupowanie, rezerwacje oraz przeglądanie filmów</h2>
 
     <h1>Teraz gramy</h1>
+
     <label for="date-picker">Wybierz datę:</label>
-    <select id="date-picker" onchange="filterByDate()">
-      <option value="" selected>Rozwin</option>
+    <select id="date-picker">
       {% for date in movie_dates.sort_values(by=['movie_date']).values %}
-          <option value="{{ date[0] }}">{{ date[0] }}</option>
+          <option value="{{ date[0] }}" {% if selected_date == date[0].strftime('%Y-%m-%d') %}selected{% endif %}>{{ date[0] }}</option>
       {% endfor %}
     </select>
 
-    <h2>Repertuar dnia: {{selected_date}}</h2>
-    
+    <h2>Repertuar dnia: {{ selected_date }}</h2>
+
+    <label for="genre-picker">Filtruj:</label>
+    <select id="genre-picker">
+      <option value="" >Gatunki filmowe</option>
+      {% for f_genre in movie_genres %}
+          <option value="{{ f_genre }}" {% if f_genre == genre %}selected{% endif %}>{{ f_genre }}</option>
+      {% endfor %}
+    </select>
+    {% if genre %}
+      <h2>Wyniki dla: {{ genre }}</h2>
+    {% endif %}
     <div class="repertoire">
       {% for index, movie in movies.iterrows() %}
       <div class="movie_list">
-        <a href="/movie/{{movie['title']}}" class="movie_poster_cont"><img class="movie_poster" src="{{movie['poster']}}" alt="movie_poster"></a>
+        <a href="/movie/{{movie['movie_id']}}" class="movie_poster_cont"><img class="movie_poster" src="{{movie['poster']}}" alt="movie_poster"></a>
         <div class="movie">
-          <div class="movie_title"><a href="/movie/{{movie['title']}}" class= "movie_title">{{movie['title']}}</a></div>
+          <div class="movie_title"><a href="/movie/{{movie['movie_id']}}" class= "movie_title">{{movie['title']}}</a></div>
           <p class="movie_info">
-            {% for genre in movie['movie_genre'].split(' / ') %}
+            {% for genre in movie['movie_genre'] %}
               <span class="movie_info_genre">{{ genre }}</span> |
             {% endfor %}
             <span class="movie_info_age_category">{{movie.age_category}}</span> |
@@ -47,7 +57,7 @@
           {% endif %}
           <div class="movie_seances">
             {% for index, seance in seances[seances['movie_id'] == movie['movie_id']].sort_values(by=['start_time']).iterrows() %}
-              <a href="#" class="movie_seances-seance{% if loop.index > 2 %} hidden{% endif %}">
+              <a href="/booking/{{seance['seance_id']}}" class="movie_seances-seance{% if loop.index > 2 %} hidden{% endif %}">
                 <p>{{ seance['start_time'] }}</p>
                 <p>{{ seance['movie_inf'] }}</p>
               </a>
@@ -63,14 +73,17 @@
     
   </div>
   <script>
-    function filterByDate() {
+    function applyFilters() {
       const selectedDate = document.getElementById('date-picker').value;
-      window.location.href = `/?date=${selectedDate}`;
+      const selectedGenre = document.getElementById('genre-picker').value;
+      window.location.href = `/?date=${selectedDate}&genre=${selectedGenre}`;
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-      const showMoreButtons = document.querySelectorAll('.show-more-seances');
+      document.getElementById('date-picker').addEventListener('change', applyFilters);
+      document.getElementById('genre-picker').addEventListener('change', applyFilters);
 
+      const showMoreButtons = document.querySelectorAll('.show-more-seances');
       showMoreButtons.forEach(button => {
         button.addEventListener('click', function(event) {
           event.preventDefault();
@@ -86,7 +99,6 @@
       });
 
       const readMoreButtons = document.querySelectorAll('.read_more-cont');
-
       readMoreButtons.forEach(button => {
         button.addEventListener('click', function(event) {
           event.preventDefault();

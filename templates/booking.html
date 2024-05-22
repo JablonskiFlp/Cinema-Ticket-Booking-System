@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="../static/booking_style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@200..900&family=M+PLUS+Rounded+1c&family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <h1>Projekt Repertuar</h1>
+    <h2 class="secondary-text-color end-of-header">Strona umożliwiająca klientom kupowanie, rezerwacje oraz przeglądanie filmów</h2>
+
+    <div class="selected_movie">
+      <img class="movie_poster" src="{{movie['poster'][0]}}" alt="movie_poster">
+      <div class="selected_movie-info">
+        <h2>ZAKUP BILETU</h2>
+        <h1>{{movie.title[0]}}</h1>
+        <p>Kraków, Sala {{room.room_number[0]}}</p>
+        <p>{{seance.movie_date[0]}}, {{seance.start_time[0]}} - <span>{{seance.movie_inf[0]}}</span></p>
+      </div>
+    </div>
+      <div class="booking_system">
+        <div class="ticket_selector">
+          <h2>Ile biletów kupujesz?</h2>
+          <div class="qty-input">
+            <button class="qty-count qty-count--minus" data-action="minus" type="button">-</button>
+            <input class="product-qty" type="number" name="product-qty" min="1" max="10" value="1">
+            <button class="qty-count qty-count--add" data-action="add" type="button">+</button>
+          </div>
+          <h3 class="ticket_prize"></h3>
+        </div>
+        <div class="room_map">
+          <h2>Wybierz miejsca</h2>
+          <ul class="showcase">
+            <li>
+              <div class="seat"></div>
+              <small>Available</small>
+            </li>
+            <li>
+              <div class="seat selected"></div>
+              <small>Selected</small>
+            </li>
+            <li>
+              <div class="seat sold"></div>
+              <small>Sold</small>
+            </li>
+          </ul>
+          <div class="screen"></div>
+            <div class="seats">
+              {% for seat in seat_map %}
+                <div class="seat {% if seat in reserved_seats %}sold{% endif %}" id="{{ seat }}">{{ seat }}</div>
+              {% endfor %}
+            </div>
+          </div>
+          <form id="booking_form" method="POST" action="/reserve_tickets">
+            <input type="hidden" name="seance_id" value="{{seance.seance_id.values[0]}}">
+            <input type="hidden" name="ticket_count" id="ticket_count" value="1">
+            <input type="hidden" name="total_price" id="total_price" value="15">
+            <input type="hidden" name="selected_seats" id="selected_seats">
+            <label>Podaj email na który prześlemy ci rezerwację</label>
+            <input type="email" id="email" name="email" placeholder="example@example.com"><br>
+            <button class="reserve_button" type="button">Zarezerwuj bilety</button>
+          </form>
+          
+        </div>
+      <h6>© Jabłoński Company. All rights reserved. </h6>
+    </div>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var qtyInputs = document.querySelectorAll('.qty-input');
+
+        if (!qtyInputs.length) {
+          return;
+        }
+
+        var ticketPriceElement = document.querySelector('.ticket_prize');
+        var ticketPricePerUnit = 15;
+
+        function updateTicketPrice(qty) {
+          var totalPrice = qty * ticketPricePerUnit;
+          ticketPriceElement.textContent = 'Cena: ' + totalPrice + ' zł';
+          document.getElementById('total_price').value = totalPrice;
+          document.getElementById('ticket_count').value = qty;
+        }
+
+        qtyInputs.forEach(function(qtyInput) {
+          var input = qtyInput.querySelector('.product-qty');
+          var minusBtn = qtyInput.querySelector('.qty-count--minus');
+          var addBtn = qtyInput.querySelector('.qty-count--add');
+          var qtyMin = parseInt(input.getAttribute('min'));
+          var qtyMax = parseInt(input.getAttribute('max'));
+
+          function updateButtons() {
+            var qty = parseInt(input.value);
+            minusBtn.disabled = qty <= qtyMin;
+            addBtn.disabled = qty >= qtyMax;
+            updateTicketPrice(qty);
+          }
+
+          input.addEventListener('change', function() {
+            var qty = parseInt(input.value);
+
+            if (isNaN(qty) || qty <= qtyMin) {
+              input.value = qtyMin;
+            } else if (qty >= qtyMax) {
+              input.value = qtyMax;
+            }
+            updateButtons();
+          });
+
+          minusBtn.addEventListener('click', function() {
+            var qty = parseInt(input.value);
+            if (qty > qtyMin) {
+              input.value = qty - 1;
+              updateButtons();
+            }
+          });
+
+          addBtn.addEventListener('click', function() {
+            var qty = parseInt(input.value);
+            if (qty < qtyMax) {
+              input.value = qty + 1;
+              updateButtons();
+            }
+          });
+
+          updateButtons();
+        });
+        const seats = document.querySelectorAll('.seats .seat:not(.sold)');
+        const ticketCount = document.querySelector('.product-qty');
+
+        seats.forEach(seat => {
+          seat.addEventListener('click', () => {
+            const selectedSeats = document.querySelectorAll('.seats .seat.selected');
+            if (seat.classList.contains('selected')) {
+              seat.classList.remove('selected');
+            } else if (selectedSeats.length < parseInt(ticketCount.value)) {
+              seat.classList.add('selected');
+            }
+
+          });
+        });
+        const reserveButton = document.querySelector('.reserve_button');
+        reserveButton.addEventListener('click', () => {
+          const emailInput = document.querySelector('#email').value;
+          const selectedSeats = document.querySelectorAll('.seats .seat.selected');
+          const selectedSeatsArray = Array.from(selectedSeats).map(seat => seat.id);
+          
+          if (!emailInput) {
+            alert('Proszę podać adres email.');
+            return;
+          }
+
+          if (selectedSeatsArray.length !== parseInt(ticketCount.value)) {
+            alert('Liczba wybranych miejsc nie zgadza się z liczbą biletów.');
+            return;
+          }
+
+          document.getElementById('selected_seats').value = selectedSeatsArray.join(',');
+          document.getElementById('booking_form').submit();
+        });
+      });
+    </script>
+</body>
+</html>
